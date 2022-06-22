@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" type=text/css>
+    <!--<link href="../static/css/styles.css" rel="stylesheet" type=text/css>-->
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+
+    <title>Trip Generation Model</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">IUTOD-TRAN</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{{ url_for('index') }}">หน้าหลัก</a>
+              </li>
+              
+              <li class="nav-item dropdown">
+                <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  โมดูลการวิเคราะห์
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="{{ url_for('tripgeninput') }}">การเกิดการเดินทาง</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('tripdisinput') }}">การกระจายการเดินทาง</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('tripassinput') }}">การแจกแจงการเดินทาง</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ url_for('throughinput') }}">การคาดการณ์การเดินทางผ่านพื้นที่</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('meinput') }}">การคาดการณ์ตารางการเดินทาง</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('shortpathinput') }}">ตารางเส้นทางการเดินทางสั้นที่สุด</a></li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('download') }}">คู่มือ</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('about') }}">เกี่ยวกับเรา</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+    <section>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for msg in messages %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>เกิดความผิดพลาด!</strong> {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+
+      {% endwith %}
+
+        <div class="contain text-center p-4">
+            <h1 class="fw-bold">การเกิดการเดินทาง</h1>
+            <h3>Trip Generation Model</h3>
+        </div>
+        <hr>
+
+      <div class="container-fluid mt-2 p-4">
+
+        <form action="tripgenbuilding" method="post" enctype="multipart/form-data">
+            <h5>ขั้นตอนที่ 1 : การนำเข้าข้อมูลพื้นที่การใช้ประโยชน์อาคาร</h5>
+            <br>
+            <hr>
+            <div class="mb-3">
+                <label for="formFile" class="form-label h6 text-muted">เลือกไฟล์ข้อมูลการใช้ประโยชน์อาคาร (csv) </label>
+                <input type="file" class="form-control" id="csvFile" name="csvFile" required>
+                <!--<small id="csvFile" class="form-text text-muted">เลือกไฟล์ข้อมูลการใช้ประโยชน์อาคาร (csv)</small>-->
+                <br>
+                <input class="btn btn-secondary" type="submit" name="" value="นำเข้าข้อมูล" required>
+            </div>            
+            <hr>
+        </form>
+        <br>
+        <form action="tripgenoutput" method="post">
+            <h5>ขั้นตอนที่ 2 : การเลือกตัวเลือกการวิเคราะห์</h5>
+            <br>
+            <hr>
+            <br>
+            <div class="mb-3">
+              <h5>ขนาดเมือง</h5>
+              <div>
+                <div class="form-check-inline mb-1">
+                  <input type="radio" name="city_type" value=1 class="form-check-input" checked>
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    เฉลี่ยทั้งประเทศ
+                  </label>
+                </div>
+
+                <div class="form-check-inline mb-1">
+                  <input type="radio" name="city_type" value=2 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    มหานคร
+                  </label>
+                </div>
+
+                <div class="form-check-inline mb-1">
+                  <input type="radio" name="city_type" value=3 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    เมืองขนาดใหญ่
+                  </label>
+                </div>
+                  
+                <div class="form-check-inline mb-1">
+                  <input type="radio" name="city_type" value=4 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    เมืองขนาดกลาง
+                  </label>
+                </div>
+              
+                <div class="form-check-inline mb-1">
+                  <input type="radio" name="city_type" value=5 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    เมืองขนาดเล็ก
+                  </label>
+                </div>
+              </div>
+              
+
+            </div>
+            <br>
+            <div class="mb-3">
+              <h5>ช่วงเวลาและหน่วยสำหรับการวิเคราะห์</h5>
+              <h6>ทั้งวัน</h6>
+              <div class="form-check-inline mb-1">
+                <input type="radio" name="unit" value=2 class="form-check-input" checked> 
+                <label class="form-check-label" for="flexRadioDefault2">
+                  เที่ยวต่อวัน
+                </label>
+              </div>
+
+              <div class="form-check-inline mb-1">
+                 <input type="radio" name="unit" value=1 class="form-check-input"> 
+                 <label class="form-check-label" for="flexRadioDefault2">
+                  คันต่อวัน
+                </label>
+              </div>
+              
+              <div class="form-check-inline mb-1">
+                 <input type="radio" name="unit" value=3 class="form-check-input"> 
+                 <label class="form-check-label" for="flexRadioDefault2">
+                  พีซียูต่อวัน
+                </label>
+              </div>
+              
+              <h6>ชั่วโมงเร่งด่วนเช้า</h6>
+              <div class="form-check-inline mb-1">
+                 <input type="radio" name="unit" value=5 class="form-check-input"> 
+                 <label class="form-check-label" for="flexRadioDefault2">
+                  เที่ยวต่อชั่วโมง
+                </label>
+              </div>
+              
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="unit" value=4 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    คันต่อชั่วโมง
+                  </label>
+              </div>
+
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="unit" value=6 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    พีซียูต่อชั่วโมง
+                  </label>
+              </div>
+                            
+              <h6>ชั่วโมงเร่งด่วนเย็น</h6>
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="unit" value=8 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    เที่ยวต่อชั่วโมง
+                  </label>
+              </div>
+
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="unit" value=7 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    คันต่อชั่วโมง
+                  </label>
+
+              </div>
+              
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="unit" value=9 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    พีซียูต่อชั่วโมง
+                  </label>
+              </div>
+              
+
+            </div>
+            <br>
+            <div class="mb-3">
+              <h5>รูปแบบการเดินทาง</h5>
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="mode" value=1 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    รถยนต์ส่วนตัว
+                  </label>
+              </div>
+
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="mode" value=2 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    รถโดยสาร
+                  </label>
+              </div>
+
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="mode" value=3 class="form-check-input"> 
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    รถบรรทุก
+                  </label>
+              </div>
+              
+              <div class="form-check-inline mb-1">
+                  <input type="radio" name="mode" value=4 class="form-check-input" checked> 
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    รวมทุกประเภท
+                  </label>
+              </div>
+            </div>
+          <br>
+          <hr>                
+          <br>
+          <button class = "btn btn-secondary" type="submit">การเกิดการเดินทาง</button>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+
+    
+    <div>
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-mute">&copy; 2022 RSI, RMUTI</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  </body>
+</html>
